@@ -1,0 +1,22 @@
+# 依赖
+node_modules/
+
+# 本地测试：里面有真实家庭数据、截图和打包出来的测试库，不对外
+test/
+
+# 历史版本备份
+backup-*/
+
+# 运行时数据（用户的图不该进仓库）
+graph.json
+data.json
+
+# 构建/截图副产物（docs 里那几张是刻意留的）
+*.html
+*.png
+!docs/*.png
+
+# 系统
+.DS_Store
+Thumbs.db
+*.log

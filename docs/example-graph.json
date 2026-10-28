@@ -1,0 +1,59 @@
+{
+  "version": 4,
+  "active": "demo",
+  "people": [
+    { "id": "n1", "name": "陈国安", "sex": "male", "birth": "1942-03-12", "death": "2019-11-02", "note": "", "remark": "" },
+    { "id": "n2", "name": "周慧兰", "sex": "female", "birth": "1945-08-30", "death": "", "note": "", "remark": "" },
+    { "id": "n3", "name": "陈志远", "sex": "male", "birth": "1968-05-21", "death": "", "note": "", "remark": "" },
+    { "id": "n4", "name": "林秋萍", "sex": "female", "birth": "1970-01-09", "death": "", "note": "", "remark": "" },
+    { "id": "n5", "name": "陈志清", "sex": "female", "birth": "1973-09-14", "death": "", "note": "", "remark": "" },
+    { "id": "n6", "name": "高建华", "sex": "male", "birth": "1971-06-03", "death": "", "note": "", "remark": "" },
+    { "id": "n7", "name": "陈志刚", "sex": "male", "birth": "1976-12-27", "death": "", "note": "", "remark": "" },
+    { "id": "n8", "name": "苏敏", "sex": "female", "birth": "1978-04-18", "death": "", "note": "", "remark": "" },
+    { "id": "n9", "name": "陈晓宇", "sex": "male", "birth": "1995-07-30", "death": "", "note": "", "remark": "" },
+    { "id": "n10", "name": "陈晓雯", "sex": "female", "birth": "1998-11-05", "death": "", "note": "", "remark": "" },
+    { "id": "n11", "name": "高天宇", "sex": "male", "birth": "2001-02-16", "death": "", "note": "", "remark": "" },
+    { "id": "n12", "name": "陈嘉禾", "sex": "female", "birth": "2005-10-08", "death": "", "note": "", "remark": "" }
+  ],
+  "layouts": [
+    {
+      "id": "demo",
+      "name": "全家",
+      "remark": "示例数据，仅供截图",
+      "nodes": [
+        { "pid": "n1", "x": 200, "y": 80, "row": 0 },
+        { "pid": "n2", "x": 320, "y": 80, "row": 0 },
+        { "pid": "n3", "x": 100, "y": 268, "row": 1 },
+        { "pid": "n4", "x": 220, "y": 268, "row": 1 },
+        { "pid": "n5", "x": 400, "y": 268, "row": 1 },
+        { "pid": "n6", "x": 520, "y": 268, "row": 1 },
+        { "pid": "n7", "x": 700, "y": 268, "row": 1 },
+        { "pid": "n8", "x": 820, "y": 268, "row": 1 },
+        { "pid": "n9", "x": 100, "y": 456, "row": 2 },
+        { "pid": "n10", "x": 220, "y": 456, "row": 2 },
+        { "pid": "n11", "x": 460, "y": 456, "row": 2 },
+        { "pid": "n12", "x": 760, "y": 456, "row": 2 }
+      ],
+      "edges": [
+        { "id": "s1", "from": "n1", "to": "n2", "type": "spouse", "label": "" },
+        { "id": "s2", "from": "n3", "to": "n4", "type": "spouse", "label": "" },
+        { "id": "s3", "from": "n5", "to": "n6", "type": "spouse", "label": "" },
+        { "id": "s4", "from": "n7", "to": "n8", "type": "spouse", "label": "" },
+        { "id": "p1", "from": "n1", "to": "n3", "type": "parent", "label": "" },
+        { "id": "p2", "from": "n2", "to": "n3", "type": "parent", "label": "" },
+        { "id": "p3", "from": "n1", "to": "n5", "type": "parent", "label": "" },
+        { "id": "p4", "from": "n2", "to": "n5", "type": "parent", "label": "" },
+        { "id": "p5", "from": "n1", "to": "n7", "type": "parent", "label": "" },
+        { "id": "p6", "from": "n2", "to": "n7", "type": "parent", "label": "" },
+        { "id": "p7", "from": "n3", "to": "n9", "type": "parent", "label": "" },
+        { "id": "p8", "from": "n4", "to": "n9", "type": "parent", "label": "" },
+        { "id": "p9", "from": "n3", "to": "n10", "type": "parent", "label": "" },
+        { "id": "p10", "from": "n4", "to": "n10", "type": "parent", "label": "" },
+        { "id": "p11", "from": "n5", "to": "n11", "type": "parent", "label": "" },
+        { "id": "p12", "from": "n6", "to": "n11", "type": "parent", "label": "" },
+        { "id": "p13", "from": "n7", "to": "n12", "type": "parent", "label": "" },
+        { "id": "p14", "from": "n8", "to": "n12", "type": "parent", "label": "" }
+      ]
+    }
+  ]
+}

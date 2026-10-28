@@ -1,0 +1,22 @@
+{
+  "name": "obsidian-family-tree",
+  "version": "1.9.2",
+  "description": "Lay out a family tree on a canvas in Obsidian.",
+  "main": "main.js",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --platform=node --format=cjs --target=es2020 --minify --charset=utf8 --external:obsidian --outfile=main.js",
+    "dev": "npm run build -- --watch"
+  },
+  "keywords": [
+    "obsidian",
+    "obsidian-plugin",
+    "family-tree",
+    "genealogy",
+    "kinship"
+  ],
+  "author": "zyk",
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}

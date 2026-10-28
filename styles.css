@@ -1,0 +1,1141 @@
+/* 家谱图 v2 · 样式
+   全部使用 Obsidian 主题变量，明暗主题自动跟随 */
+
+.jiapu-view {
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+
+  /* 连线配色：亮色主题下一层，暗色主题另一层，保证在任何主题里都看得清 */
+  --jiapu-line: #b3bbc9;
+  --jiapu-line-strong: #8c96a8;
+  --jiapu-spouse: #c07f99;
+
+  /* 卡片：男蓝女红，整卡填充。文字统一用浅色，任何主题下都够对比 */
+  --jiapu-male-fill: #2f6bb5;
+  --jiapu-male-fill-hover: #3a79c6;
+  --jiapu-male-stroke: #1f4f8c;
+  --jiapu-female-fill: #b8435c;
+  --jiapu-female-fill-hover: #c94e69;
+  --jiapu-female-stroke: #8e2f44;
+  --jiapu-unknown-fill: #6a7180;
+  --jiapu-unknown-fill-hover: #78808f;
+  --jiapu-unknown-stroke: #4e5560;
+  --jiapu-card-text: #f8f9fc;
+  --jiapu-card-text-dim: rgba(255, 255, 255, 0.76);
+
+  /* 已故：红色框 + 黑底 */
+  --jiapu-dead-fill: #0e0e12;
+  --jiapu-dead-fill-hover: #17171d;
+  --jiapu-dead-stroke: #e0484f;
+  --jiapu-dead-stroke-hover: #ff6266;
+  --jiapu-dead-stroke-select: #ff7b7e;
+  --jiapu-dead-text: #f2f2f5;
+  --jiapu-dead-text-dim: rgba(255, 255, 255, 0.6);
+
+  /* 悬停/选中的描边：深色卡片配白边，浅色卡片（自定义主题）会由主题改成深边 */
+  --jiapu-card-stroke-hover: #ffffff;
+  --jiapu-select-stroke: var(--text-on-accent, #ffffff);
+
+  /* 线宽：主题里可以整体放大缩小 */
+  --jiapu-line-w: 2;
+  --jiapu-spouse-w: 2.4;
+  --jiapu-spouse-w-hover: 2.8;
+  --jiapu-line-w-other: 1.8;
+}
+
+.theme-dark .jiapu-view {
+  --jiapu-line: #767f92;
+  --jiapu-line-strong: #9ba5b9;
+  --jiapu-spouse: #bd7d9b;
+
+  --jiapu-male-fill: #356fb8;
+  --jiapu-male-fill-hover: #417fc9;
+  --jiapu-female-fill: #b6475f;
+  --jiapu-female-fill-hover: #c6526a;
+}
+
+.jiapu-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+/* ---------- 工具栏 ---------- */
+
+.jiapu-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+}
+
+.jiapu-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 9px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-muted);
+  box-shadow: none;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.jiapu-tool:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+  border-color: var(--background-modifier-border);
+}
+
+.jiapu-tool.is-on {
+  color: var(--text-accent);
+  border-color: var(--background-modifier-border);
+  background: var(--background-primary);
+}
+
+.jiapu-tool-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.jiapu-tool-icon .svg-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.jiapu-tool-text {
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.jiapu-toolbar-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--background-modifier-border);
+  margin: 0 6px;
+}
+
+.jiapu-toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+.jiapu-zoom {
+  min-width: 44px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 画布 ---------- */
+
+.jiapu-canvas {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--background-primary);
+  cursor: grab;
+}
+
+.jiapu-canvas:active {
+  cursor: grabbing;
+}
+
+.jiapu-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.jiapu-grid {
+  pointer-events: none;
+}
+
+.jiapu-grid-dot {
+  fill: var(--text-faint);
+  opacity: 0.16;
+}
+
+/* ---------- 连线 ---------- */
+
+.jiapu-line .jiapu-seg {
+  fill: none;
+  stroke: var(--jiapu-line, var(--text-muted));
+  stroke-width: var(--jiapu-line-w, 2);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* 缩放时线宽不变：缩到 60% 也不会细成一根头发丝 */
+  vector-effect: non-scaling-stroke;
+  transition: stroke 0.12s ease;
+}
+
+.jiapu-line .jiapu-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 18;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+/* 鼠标停在线上，把这一家的线整条点亮 */
+.jiapu-line.is-hl .jiapu-seg,
+.jiapu-line.parent:hover .jiapu-seg {
+  stroke: var(--jiapu-line-strong);
+}
+
+/* 亲子线：主干（横线 + 竖干）略深，指到子女的竖线稍浅 */
+.jiapu-line.parent.is-family .jiapu-seg {
+  stroke: var(--jiapu-line-strong);
+}
+
+.jiapu-line.spouse .jiapu-seg {
+  stroke: var(--jiapu-spouse);
+  stroke-width: var(--jiapu-spouse-w, 2.4);
+}
+
+.jiapu-line.spouse:hover .jiapu-seg {
+  stroke: var(--interactive-accent);
+  stroke-width: var(--jiapu-spouse-w-hover, 2.8);
+}
+
+.jiapu-knot {
+  fill: var(--jiapu-spouse);
+  pointer-events: none;
+}
+
+.jiapu-line.spouse:hover .jiapu-knot {
+  fill: var(--interactive-accent);
+}
+
+/* 配偶线中间的互换按钮：默认藏着，鼠标靠近这对夫妻才浮出来 */
+.jiapu-swap {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+  cursor: pointer;
+}
+
+.jiapu-line.spouse:hover .jiapu-swap,
+.jiapu-swap:hover {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.jiapu-swap-hit {
+  fill: transparent;
+  pointer-events: all;
+}
+
+.jiapu-swap-ring {
+  fill: var(--background-primary);
+  stroke: var(--jiapu-spouse);
+  stroke-width: 1.2;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.18));
+}
+
+.jiapu-swap-icon {
+  fill: none;
+  stroke: var(--jiapu-spouse);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.jiapu-swap:hover .jiapu-swap-ring {
+  stroke: var(--interactive-accent);
+}
+
+.jiapu-swap:hover .jiapu-swap-icon {
+  stroke: var(--interactive-accent);
+}
+
+.jiapu-line.other .jiapu-seg {
+  stroke: var(--text-faint);
+  stroke-width: var(--jiapu-line-w-other, 1.8);
+  stroke-dasharray: 4 5;
+  opacity: 0.9;
+}
+
+.jiapu-line.other:hover .jiapu-seg {
+  stroke: var(--text-error);
+  opacity: 1;
+}
+
+.jiapu-link-preview {
+  fill: none;
+  stroke: var(--interactive-accent);
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+/* 拖拽时的参考线：竖向＝对齐谁的中线，横向＝会落在哪一排 */
+.jiapu-guide {
+  stroke: var(--interactive-accent);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.jiapu-guide.is-h {
+  opacity: 0.9;
+  stroke-dasharray: 8 6;
+}
+
+/* ---------- 卡片 ---------- */
+
+.jiapu-node {
+  cursor: grab;
+}
+
+/* 性别底色：男蓝女红，整张卡片填满，不靠一条细边认人 */
+.jiapu-node.is-male .jiapu-card {
+  fill: var(--jiapu-male-fill);
+  stroke: var(--jiapu-male-stroke);
+}
+
+.jiapu-node.is-female .jiapu-card {
+  fill: var(--jiapu-female-fill);
+  stroke: var(--jiapu-female-stroke);
+}
+
+.jiapu-node.is-unknown .jiapu-card {
+  fill: var(--jiapu-unknown-fill);
+  stroke: var(--jiapu-unknown-stroke);
+}
+
+.jiapu-card {
+  fill: var(--jiapu-unknown-fill);
+  stroke: var(--jiapu-unknown-stroke);
+  stroke-width: 1.2;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.16));
+  transition: fill 0.12s ease, stroke 0.12s ease;
+}
+
+.jiapu-node.is-male:hover .jiapu-card {
+  fill: var(--jiapu-male-fill-hover);
+  stroke: var(--jiapu-card-stroke-hover);
+}
+
+.jiapu-node.is-female:hover .jiapu-card {
+  fill: var(--jiapu-female-fill-hover);
+  stroke: var(--jiapu-card-stroke-hover);
+}
+
+.jiapu-node.is-unknown:hover .jiapu-card {
+  fill: var(--jiapu-unknown-fill-hover);
+  stroke: var(--jiapu-card-stroke-hover);
+}
+
+.jiapu-node.is-selected .jiapu-card {
+  stroke: var(--jiapu-select-stroke);
+  stroke-width: 2.2;
+  filter: drop-shadow(0 0 0 2px rgba(0, 0, 0, 0.18))
+    drop-shadow(0 3px 8px rgba(0, 0, 0, 0.24));
+}
+
+/* 左边那条窄色条：同底色系里再深一档，起个立体感 */
+.jiapu-accent {
+  fill: rgba(0, 0, 0, 0.16);
+  pointer-events: none;
+}
+
+.jiapu-name {
+  fill: var(--jiapu-card-text);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  pointer-events: none;
+}
+
+.jiapu-dates {
+  fill: var(--jiapu-card-text-dim);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+/* 右上角的文件标识：只有挂了笔记的卡片才有 */
+.jiapu-badge {
+  pointer-events: none;
+}
+
+.jiapu-badge-tile {
+  fill: rgba(255, 255, 255, 0.18);
+  transition: fill 0.12s ease;
+}
+
+.jiapu-node:hover .jiapu-badge-tile {
+  fill: rgba(255, 255, 255, 0.34);
+}
+
+.jiapu-badge-icon {
+  fill: rgba(255, 255, 255, 0.92);
+}
+
+.jiapu-badge-fold {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.82);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+
+/* ---------- 连线把手 ---------- */
+
+.jiapu-handle {
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  cursor: crosshair;
+}
+
+.jiapu-node:hover .jiapu-handle,
+.jiapu-handle:active {
+  opacity: 1;
+}
+
+.jiapu-handle-hit {
+  fill: var(--background-primary);
+  stroke: var(--background-modifier-border);
+  stroke-width: 1;
+}
+
+.jiapu-handle-dot {
+  fill: var(--text-faint);
+}
+
+.handle-spouse .jiapu-handle-dot {
+  fill: var(--text-accent);
+}
+
+.jiapu-handle:hover .jiapu-handle-hit {
+  stroke: var(--interactive-accent);
+  fill: var(--background-primary-alt);
+}
+
+.jiapu-handle:hover .jiapu-handle-dot {
+  fill: var(--interactive-accent);
+}
+
+.jiapu-nodes.linking .jiapu-handle {
+  opacity: 1;
+}
+
+/* ---------- 提示 ---------- */
+
+.jiapu-hint {
+  flex: 0 0 auto;
+  padding: 6px 12px;
+  font-size: 11.5px;
+  color: var(--text-faint);
+  border-top: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+}
+
+/* ---------- 弹窗 ---------- */
+
+.jiapu-modal .setting-item {
+  border-top: none;
+  padding: 6px 0;
+}
+
+.jiapu-modal h3 {
+  margin: 0 0 12px;
+}
+
+.jiapu-modal-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.jiapu-spacer {
+  flex: 1 1 auto;
+}
+
+/* ---------- 工具栏：布局切换 / 禁用态 ---------- */
+
+.jiapu-layout-btn {
+  gap: 4px;
+  border-color: var(--background-modifier-border);
+  background: var(--background-primary);
+}
+
+.jiapu-layout-btn:hover {
+  border-color: var(--interactive-accent);
+}
+
+.jiapu-layout-label {
+  max-width: 168px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jiapu-layout-caret {
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.5;
+}
+
+.jiapu-layout-caret .svg-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.jiapu-tool:disabled,
+.jiapu-tool.is-dim {
+  opacity: 0.32;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ---------- 已故的人：红色框 + 黑底，盖过性别色 ---------- */
+
+.jiapu-node.is-deceased .jiapu-card {
+  fill: var(--jiapu-dead-fill);
+  stroke: var(--jiapu-dead-stroke);
+  stroke-width: 2;
+}
+
+.jiapu-node.is-deceased:hover .jiapu-card {
+  fill: var(--jiapu-dead-fill-hover);
+  stroke: var(--jiapu-dead-stroke-hover);
+}
+
+.jiapu-node.is-deceased.is-selected .jiapu-card {
+  stroke: var(--jiapu-dead-stroke-select);
+  stroke-width: 2.4;
+}
+
+.jiapu-node.is-deceased .jiapu-accent {
+  fill: var(--jiapu-dead-stroke);
+}
+
+.jiapu-node.is-deceased .jiapu-name {
+  fill: var(--jiapu-dead-text);
+}
+
+.jiapu-node.is-deceased .jiapu-dates {
+  fill: var(--jiapu-dead-text-dim);
+}
+
+.jiapu-node.is-deceased .jiapu-badge-tile {
+  fill: rgba(255, 255, 255, 0.14);
+}
+
+.jiapu-death-mark {
+  pointer-events: none;
+}
+
+.jiapu-death-dot {
+  fill: #0b0b0e;
+  stroke: var(--jiapu-dead-stroke);
+  stroke-width: 1.2;
+}
+
+.jiapu-death-cross {
+  fill: var(--jiapu-dead-stroke);
+  font-family: var(--font-text);
+  font-weight: 700;
+}
+
+/* ---------- 管理布局弹窗 ---------- */
+
+.jiapu-layouts-modal {
+  /* 内容自己钉宽度：主题用 !important 盖 .modal 的宽度时，光压外层压不住。
+     44px 是弹窗左右内边距，减掉它才装得进 94vw 的壳里。 */
+  width: min(680px, calc(94vw - 44px));
+  max-width: calc(94vw - 44px);
+  box-sizing: border-box;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.jiapu-layout-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
+  max-height: 52vh;
+  overflow-y: auto;
+  /* 里面的输入框宽了也只在自己格子里换行，不许把整行推出弹窗 */
+  overflow-x: hidden;
+  padding-right: 2px;
+}
+
+.jiapu-layout-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-primary);
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.jiapu-layout-row.is-active {
+  border-color: var(--interactive-accent);
+  background: var(--background-primary-alt);
+}
+
+.jiapu-layout-head {
+  display: flex;
+  align-items: center;
+  /* 窗口窄了就换到第二行，绝不让「35 人」和按钮被挤出弹窗 */
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  min-width: 0;
+}
+
+.jiapu-layout-index {
+  flex: 0 0 auto;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background: var(--background-modifier-hover);
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 20px;
+  text-align: center;
+}
+
+.jiapu-layout-name {
+  /* 用明确的 flex-basis，别让 Obsidian 的 input{width:100%} 当基准把兄弟元素顶出去 */
+  flex: 1 1 160px;
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
+  font-weight: 600;
+}
+
+.jiapu-layout-count {
+  flex: 0 0 auto;
+  font-size: 11.5px;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.jiapu-layout-remark {
+  font-size: 12px;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-top: 1px dashed var(--background-modifier-border);
+  padding: 4px 9px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.jiapu-layout-remark:focus {
+  background: var(--background-primary-alt);
+}
+
+.jiapu-layout-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex: 0 1 auto;
+}
+
+.jiapu-layout-actions button {
+  font-size: 11.5px;
+  padding: 2px 7px;
+  height: 24px;
+  box-shadow: none;
+}
+
+.jiapu-icon-btn {
+  width: 24px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.jiapu-icon-btn .svg-icon {
+  width: 13px;
+  height: 13px;
+}
+
+/* ---------- 人物库选择弹窗 ---------- */
+
+.jiapu-pick-modal {
+  /* 这两个弹窗不抢宽度，只把上限钉住，内容再长也只在里面换行 */
+  max-width: calc(94vw - 44px);
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.jiapu-pick-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 46vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin: 4px 0 8px;
+}
+
+.jiapu-pick-tools {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 2px 0 6px;
+}
+
+.jiapu-pick-tools button {
+  height: 26px;
+  padding: 0 9px;
+  font-size: 12px;
+  box-shadow: none;
+}
+
+.jiapu-pick-count {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.jiapu-pick-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  min-width: 0;
+  border: 1px solid transparent;
+  color: var(--text-normal);
+  font-size: 13px;
+  line-height: 1.5;
+  user-select: none;
+}
+
+.jiapu-pick-row:hover {
+  background: var(--background-modifier-hover);
+}
+
+/* 整行勾选：底色 + 边框一起亮，一眼看出选没选上 */
+.jiapu-pick-row.is-checked {
+  background: var(--background-modifier-hover);
+  border-color: var(--interactive-accent);
+  box-shadow: inset 0 0 0 1px var(--interactive-accent);
+}
+
+.jiapu-pick-row.is-checked .jiapu-pick-text {
+  color: var(--text-normal);
+  font-weight: 600;
+}
+
+.jiapu-pick-row:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: -2px;
+}
+
+.jiapu-pick-row input[type="checkbox"] {
+  margin: 0;
+  flex: 0 0 auto;
+  cursor: pointer;
+  width: 15px;
+  height: 15px;
+  accent-color: var(--interactive-accent);
+}
+
+.jiapu-pick-text {
+  flex: 1 1 auto;
+  font-size: 13px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- 亲戚计算器 ---------- */
+
+.jiapu-kinship-pickers {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 0 4px;
+}
+
+/* 带搜索的人物选择框 */
+.jiapu-search {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.jiapu-search-title {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.jiapu-search-input {
+  width: 100%;
+  box-sizing: border-box;
+  height: 32px;
+  padding: 0 10px;
+  font-size: 13.5px;
+  color: var(--text-normal);
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+}
+
+.jiapu-search-input:focus {
+  border-color: var(--interactive-accent);
+  box-shadow: none;
+  outline: none;
+}
+
+.jiapu-search-list {
+  /* 贴着输入框悬浮，不占高度——展开/收起都不会把下面的内容顶来顶去 */
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 60;
+  display: none;
+  box-sizing: border-box;
+  /* 6 行整：4px 内边距 + 2px 边框 + 6×28 —— 不多不少，不会切出半行 */
+  max-height: 178px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-primary);
+  box-shadow: 0 10px 28px var(--background-modifier-box-shadow, rgba(0, 0, 0, 0.28));
+}
+
+/* 下方没地方时翻到输入框上面展开 */
+.jiapu-search-list.is-above {
+  top: auto;
+  bottom: calc(100% + 4px);
+}
+
+.jiapu-search-list.is-open {
+  display: block;
+}
+
+.jiapu-search-hit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.jiapu-search-hit.is-active {
+  background: var(--background-modifier-hover);
+}
+
+.jiapu-search-hit.is-picked .jiapu-search-name {
+  color: var(--text-accent);
+  font-weight: 600;
+}
+
+.jiapu-search-name {
+  font-size: 13px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jiapu-search-meta {
+  margin-left: auto;
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.jiapu-search-empty {
+  padding: 8px;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.jiapu-kinship-result {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 0;
+  /* 两张卡片的高度就摆在这儿：换人、连不上，弹窗都不会突然变矮 */
+  min-height: 182px;
+}
+
+.jiapu-kinship-line {
+  padding: 10px 12px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-primary-alt);
+}
+
+.jiapu-kinship-say {
+  font-size: 14px;
+  color: var(--text-normal);
+}
+
+.jiapu-kinship-who {
+  color: var(--text-muted);
+}
+
+.jiapu-kinship-term {
+  font-weight: 700;
+  color: var(--text-accent);
+  font-size: 16px;
+}
+
+.jiapu-kinship-term.is-fuzzy {
+  color: var(--text-normal);
+}
+
+.jiapu-kinship-chain,
+.jiapu-kinship-note,
+.jiapu-kinship-miss {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.jiapu-kinship-note {
+  font-style: italic;
+}
+
+/* 没注释时留的空行：占位保高度，但别让人看见 */
+.jiapu-kinship-note.is-blank {
+  visibility: hidden;
+}
+
+/* ---------- 备份列表 ---------- */
+
+.jiapu-backup-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 50vh;
+  overflow-y: auto;
+  margin: 10px 0 4px;
+  padding-right: 2px;
+}
+
+.jiapu-backup-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-primary-alt);
+}
+
+.jiapu-backup-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.jiapu-backup-name {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jiapu-backup-meta {
+  margin-top: 2px;
+  font-size: var(--font-ui-smaller, 12px);
+  color: var(--text-muted);
+}
+
+.jiapu-backup-empty {
+  padding: 10px 2px;
+  color: var(--text-muted);
+}
+
+.jiapu-backup-empty p {
+  margin: 0 0 4px;
+}
+
+/* 设置页里的版本号：升级后用来确认到底有没有重载 */
+.jiapu-version {
+  margin: -2px 0 6px;
+  font-size: var(--font-ui-smaller, 12px);
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 主题 ---------- */
+
+.jiapu-theme-modal h4 {
+  margin: 18px 0 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.jiapu-theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(126px, 1fr));
+  gap: 8px;
+}
+
+.jiapu-theme-card {
+  padding: 8px 10px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-primary-alt);
+  cursor: pointer;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.jiapu-theme-card:hover {
+  border-color: var(--background-modifier-border-hover, var(--text-faint));
+}
+
+.jiapu-theme-card.is-active {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 1px var(--interactive-accent);
+}
+
+.jiapu-theme-chips {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.jiapu-theme-chip {
+  width: 24px;
+  height: 13px;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.16);
+}
+
+.jiapu-theme-name {
+  font-size: 12.5px;
+  color: var(--text-normal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.jiapu-theme-group {
+  margin: 10px 0 2px;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.jiapu-color-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 3px 0;
+}
+
+.jiapu-color-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--text-normal);
+  white-space: nowrap;
+}
+
+.jiapu-color-picker {
+  /* flex-basis 钉死：有的主题会给 input 加 width:100%，那会把这一行撑变形 */
+  flex: 0 0 34px;
+  box-sizing: border-box;
+  width: 34px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 5px;
+  background: none;
+  cursor: pointer;
+}
+
+.jiapu-color-hex {
+  flex: 0 0 92px;
+  box-sizing: border-box;
+  width: 92px;
+  height: 24px;
+  padding: 0 6px;
+  font-family: var(--font-monospace);
+  font-size: 12px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.jiapu-theme-slider {
+  flex: 1 1 auto;
+  max-width: 220px;
+}
+
+.jiapu-theme-width {
+  width: 44px !important;
+  border: none !important;
+  background: none !important;
+  color: var(--text-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.jiapu-theme-preview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px;
+  border: 1px dashed var(--background-modifier-border);
+  border-radius: 8px;
+}
+
+.jiapu-preview-card {
+  flex: 0 0 auto;
+  min-width: 62px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.jiapu-preview-line {
+  flex: 1 1 auto;
+  min-width: 18px;
+  height: 0;
+  border-top-style: solid;
+}
