@@ -1,0 +1,5 @@
+# 统一用 LF，免得 Windows 上每次 diff 都是整文件换行变化
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
