@@ -1,9 +1,9 @@
 {
   "id": "family-tree-canvas",
   "name": "Family Tree Canvas",
-  "version": "1.9.6",
+  "version": "1.9.7",
   "minAppVersion": "1.8.0",
-  "description": "Lay out a family tree on a canvas: a shared people library, several layouts, one generation per row, snap-to-grid cards, compact and centre, a kinship calculator, themes, Markdown export and JSON backups.",
+  "description": "Draw a family tree by hand on a canvas, no note per person required. Cards snap to generation rows, relatives are added by right-click, and one people library feeds several layouts.",
   "author": "zyk-13",
   "authorUrl": "https://github.com/zyk-13",
   "isDesktopOnly": false
