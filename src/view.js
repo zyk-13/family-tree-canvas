@@ -690,7 +690,9 @@ export class JiapuView extends ItemView {
     for (const drop of path.drops) {
       const d = `M${drop.x},${drop.from}V${drop.to}`;
       const group = el("g", {
-        class: "jiapu-line parent is-drop",
+        // is-one-sided：夫妻只有一方连了这个孩子，线画成虚线提醒补上
+        class:
+          "jiapu-line parent is-drop" + (drop.oneSided ? " is-one-sided" : ""),
         "data-family": family,
         "data-child": drop.child,
         "data-parents": parentIds,
@@ -1902,13 +1904,37 @@ export class JiapuView extends ItemView {
     return this.toGraph(rect.left + rect.width / 2, rect.top + rect.height / 2);
   }
 
+  /**
+   * 新人该连哪些家长。
+   *
+   * 「在配偶卡片上添加子女」就是这对夫妻的子女，所以对方（人在当前图上时）
+   * 也要连一条。少连一边的话，图上会被夫妻合线掩盖住，导出成单亲才看得出来。
+   */
+  parentsForNewChild(node) {
+    const onCanvas = new Set(this.store.nodes.map((item) => item.id));
+    const partners = this.store
+      .spousesOf(node.id)
+      .filter((id) => onCanvas.has(id));
+    return [node.id, ...partners].slice(0, 2);
+  }
+
+  /** 本人的父母；只连了一方时，把这位家长的配偶一并补上——兄弟姐妹同父母 */
+  parentsForSibling(node) {
+    const parents = this.store.parentsOf(node.id);
+    if (parents.length !== 1) return parents;
+    const onCanvas = new Set(this.store.nodes.map((item) => item.id));
+    const partners = this.store
+      .spousesOf(parents[0])
+      .filter((id) => onCanvas.has(id));
+    return partners.length === 1 ? [parents[0], partners[0]] : parents;
+  }
+
   addChild(node) {
     new NodeModal(this.app, {
       title: t("给「{name}」添加子女", { name: node.name }),
       onSubmit: (draft) => {
         const created = this.store.addNode(draft);
-        const parents = [node.id, ...this.store.spousesOf(node.id)].slice(0, 2);
-        for (const parentId of parents)
+        for (const parentId of this.parentsForNewChild(node))
           this.store.addEdge(parentId, created.id, EDGE_PARENT);
         this.placeNew(created.id);
         this.selected = created.id;
@@ -1957,7 +1983,7 @@ export class JiapuView extends ItemView {
   }
 
   addSibling(node) {
-    const parents = this.store.parentsOf(node.id);
+    const parents = this.parentsForSibling(node);
     new NodeModal(this.app, {
       title: t("给「{name}」添加兄弟姐妹", { name: node.name }),
       onSubmit: (draft) => {

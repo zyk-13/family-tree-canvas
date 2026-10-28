@@ -533,15 +533,22 @@ export function computeLayout(store, options = {}) {
       row: parentRow,
       bus: { y: busY, from: minX, to: maxX },
       trunk: { x: parentX, from: parentBottom, to: busY },
-      drops: childBoxes.map((box) => ({
-        x: box.x,
-        from: busY,
-        to: box.y - box.h / 2,
-        child: box.id,
-        edges: unit.members
-          .map((parentId) => parentEdge(parentId, box.id))
-          .filter(Boolean),
-      })),
+      drops: childBoxes.map((box) => {
+        const linked = unit.members
+          .map((parentId) => ({ parentId, edge: parentEdge(parentId, box.id) }))
+          .filter((item) => item.edge);
+        return {
+          x: box.x,
+          from: busY,
+          to: box.y - box.h / 2,
+          child: box.id,
+          edges: linked.map((item) => item.edge),
+          // 夫妻只有一方连了这孩子：线照旧从合线上下来，但画成虚线，
+          // 免得「其实少连了一根」在图上完全看不出来，导出成单亲才发现。
+          oneSided: linked.length < unit.members.length,
+          linkedParents: linked.map((item) => item.parentId),
+        };
+      }),
     });
   }
 
