@@ -70,15 +70,15 @@ Source lives in `src/`:
 
 | File | Role |
 | --- | --- |
-| `main.js` | Plugin entry: commands, backup/restore, settings tab |
-| `view.js` | The canvas view: pan, zoom, drag, snapping, toolbar |
-| `layout.js` | Layout computation, connector geometry, tidy-tree compaction |
-| `model.js` | Data model v4, people library, layouts, persistence |
-| `modals.js` | Person editor, layouts manager, kinship, backup, theme dialogs |
-| `kinship.js` | Relationship path search and Chinese kinship naming |
-| `theme.js` | Theme presets, colour derivation, CSS variable output |
-| `i18n.js` | English / Chinese strings |
-| `backup.js` | Backup envelope format, parsing, formatting |
+| `src/main.js` | Plugin entry: commands, backup/restore, settings tab |
+| `src/view.js` | The canvas view: pan, zoom, drag, snapping, toolbar |
+| `src/layout.js` | Layout computation, connector geometry, tidy-tree compaction |
+| `src/model.js` | Data model v4, people library, layouts, persistence |
+| `src/modals.js` | Person editor, layouts manager, kinship, backup, theme dialogs |
+| `src/kinship.js` | Relationship path search and Chinese kinship naming |
+| `src/theme.js` | Theme presets, colour derivation, CSS variable output |
+| `src/i18n.js` | English / Chinese strings |
+| `src/backup.js` | Backup envelope format, parsing, formatting |
 
 ## License
 
