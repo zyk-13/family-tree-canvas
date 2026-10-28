@@ -1,5 +1,7 @@
 # Family Tree
 
+English · [简体中文](README.zh-CN.md)
+
 Lay out a family tree on a canvas the way you'd sketch one on paper — not a generated diagram, but a board you arrange by hand.
 
 Cards snap to generation rows, so you drag people where you want them sideways and the tree stays tidy vertically. One shared people library feeds several layouts, and every person is a note in your vault.
