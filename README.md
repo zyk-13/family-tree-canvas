@@ -30,7 +30,7 @@ Once published, search for **Family Tree** in *Settings → Community plugins �
 
 Until then, install manually:
 
-1. Download `main.js`, `manifest.json`, and `styles.css` from the latest release.
+1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/zyk-13/family-tree/releases/latest).
 2. Put them in `<your vault>/.obsidian/plugins/family-tree/`.
 3. Reload Obsidian and enable **Family Tree** in *Settings → Community plugins*.
 
