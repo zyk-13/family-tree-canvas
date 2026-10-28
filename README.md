@@ -16,7 +16,7 @@ That matters when a family is messy — remarriage, adoption, someone raised by 
 
 ## Features
 
-- **One people library, many layouts.** The same 36 people can appear in a "whole family" layout, a "my household" layout, and a "grandpa's branch" layout. Editing a name or a birth date in one place updates all of them, and each person keeps a single note.
+- **One people library, many layouts.** The same people can appear in a "whole family" layout, a "my household" layout, and a "grandpa's branch" layout. Editing a name or a birth date in one place updates all of them, and each person keeps a single note.
 - **Snap to rows.** Drag a card sideways freely; drop it and it lands in a generation row. Rows are cleaned up when you compact.
 - **Compact and centre.** A tidy-tree pass: children line up under their parents, the whole tree tightens, parents sit centred over their children. Repeat it — it's idempotent.
 - **Swap a couple.** One click flips a husband and wife left/right, and the whole subtree follows.
