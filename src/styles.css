@@ -1105,10 +1105,11 @@
   max-width: 220px;
 }
 
+/* 线宽读数：和 .jiapu-color-hex 同一颗元素，这里只改宽度与对齐，
+   用 flex-basis 压窄，不去和 Obsidian 的输入框样式抢优先级 */
 .jiapu-theme-width {
-  width: 44px !important;
-  border: none !important;
-  background: none !important;
+  flex: 0 0 44px;
+  width: 44px;
   color: var(--text-muted);
   text-align: right;
   font-variant-numeric: tabular-nums;

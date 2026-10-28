@@ -998,15 +998,31 @@ function normalizeSexText(value) {
   return "";
 }
 
+/** 指定文件夹（含子文件夹）里的 Markdown 文件，不碰别的目录 */
+function markdownFilesUnder(app, path) {
+  const start = app.vault.getAbstractFileByPath(path);
+  if (!start || !Array.isArray(start.children)) return [];
+  const found = [];
+  const walk = (dir) => {
+    for (const child of dir.children ?? []) {
+      if (Array.isArray(child.children)) walk(child);
+      else if (child.extension === "md") found.push(child);
+    }
+  };
+  walk(start);
+  return found;
+}
+
 /**
  * 扫描文件夹里的笔记，生成一张独立的图（v4 结构）。
  * 只在用户明确点「从笔记导入」时执行一次。
+ *
+ * 只顺着设置里那个文件夹往下走，不去枚举整个库——插件没理由知道
+ * 用户其它笔记的存在。
  */
 export async function importFromNotes(app, folder) {
-  const prefix = (folder ?? "").replace(/\/+$/, "");
-  const files = app.vault
-    .getMarkdownFiles()
-    .filter((file) => !prefix || file.path.startsWith(prefix + "/"));
+  const root = (folder ?? "").replace(/^\/+|\/+$/g, "");
+  const files = root ? markdownFilesUnder(app, root) : [];
 
   const graph = emptyGraph();
   const layout = graph.layouts[0];
