@@ -1,7 +1,7 @@
 {
   "id": "family-tree-canvas",
   "name": "Family Tree Canvas",
-  "version": "1.9.5",
+  "version": "1.9.6",
   "minAppVersion": "1.8.0",
   "description": "Lay out a family tree on a canvas: a shared people library, several layouts, one generation per row, snap-to-grid cards, compact and centre, a kinship calculator, themes, Markdown export and JSON backups.",
   "author": "zyk-13",

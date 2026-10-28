@@ -4,12 +4,13 @@
  * 交互约定：
  *   拖动卡片        → 横向自由拖（吸附对齐）；上下拖动＝换排，只能落在整行基线上
  *   拖动时按住 Alt  → 临时关掉横向吸附（换排限制仍然生效）
- *   卡片下边圆点    → 拖到另一人，建立亲子关系（往下拖＝我是长辈，往上拖＝对方是长辈）
- *   卡片右边圆点    → 拖到另一人，建立配偶关系
  *   双击卡片        → 打开关联笔记（没关联笔记就什么都不做）
  *   右键卡片        → 菜单（编辑、关联/更换/移除笔记、加亲属、与配偶互换左右、删除）
  *   右键连线        → 删除这条关系
  *   空白拖动        → 平移；滚轮＝缩放
+ *
+ * 关系只在「加人」时建立：加子女 / 加父母 / 加配偶 / 加兄弟姐妹 都自动连好双方，
+ * 不提供拖拽连线 —— 手动连线很容易只连一方，图上却看不出来。
  */
 import { ItemView, Menu, Notice, setIcon } from "obsidian";
 import {
@@ -646,8 +647,6 @@ export class JiapuView extends ItemView {
     for (const box of layout.boxes) this.drawNode(box);
 
     this.drawGuides();
-    if (this.interaction?.kind === "link" && this.interaction.preview)
-      this.overlayLayer.appendChild(this.interaction.preview);
   }
 
   applyTransform() {
@@ -948,33 +947,6 @@ export class JiapuView extends ItemView {
       group.appendChild(title);
     }
 
-    // 连线把手
-    const childHandle = el("g", {
-      class: "jiapu-handle handle-child",
-      "data-handle": "child",
-      "data-from": node.id,
-      transform: `translate(0 ${h / 2})`,
-    });
-    childHandle.appendChild(el("circle", { r: 10, class: "jiapu-handle-hit" }));
-    childHandle.appendChild(
-      el("circle", { r: 3.4, class: "jiapu-handle-dot" }),
-    );
-    group.appendChild(childHandle);
-
-    const spouseHandle = el("g", {
-      class: "jiapu-handle handle-spouse",
-      "data-handle": "spouse",
-      "data-from": node.id,
-      transform: `translate(${w / 2} 0)`,
-    });
-    spouseHandle.appendChild(
-      el("circle", { r: 10, class: "jiapu-handle-hit" }),
-    );
-    spouseHandle.appendChild(
-      el("circle", { r: 3.4, class: "jiapu-handle-dot" }),
-    );
-    group.appendChild(spouseHandle);
-
     this.nodeLayer.appendChild(group);
   }
 
@@ -1059,17 +1031,6 @@ export class JiapuView extends ItemView {
       event.stopPropagation();
       const [a, b] = String(swapEl.getAttribute("data-swap") ?? "").split("|");
       if (a && b) this.swapWithSpouse(a, b);
-      return;
-    }
-    const handle = target.closest?.("[data-handle]");
-    if (handle) {
-      event.preventDefault();
-      event.stopPropagation();
-      this.startLink(
-        event,
-        handle.getAttribute("data-from"),
-        handle.getAttribute("data-handle"),
-      );
       return;
     }
     const nodeEl = target.closest?.("[data-id]");
@@ -1332,96 +1293,6 @@ export class JiapuView extends ItemView {
         best = { delta, guide: target.guide };
     }
     return { dx: best ? best.delta : 0, guide: best ? best.guide : null };
-  }
-
-  startLink(event, fromId, kind) {
-    if (!fromId) return;
-    const preview = el("path", { class: "jiapu-link-preview" });
-    this.interaction = { kind: "link", fromId, handle: kind, preview };
-    this.render();
-
-    const move = (moveEvent) => {
-      const box = this.boxAt(moveEvent.clientX, moveEvent.clientY);
-      const from = this.layout?.boxes.find((item) => item.id === fromId);
-      if (!from) return;
-      const target = this.toGraph(moveEvent.clientX, moveEvent.clientY);
-      const startX = kind === "spouse" ? from.x + from.w / 2 : from.x;
-      const startY = kind === "spouse" ? from.y : from.y + from.h / 2;
-      const endX = box
-        ? kind === "spouse"
-          ? box.x - box.w / 2
-          : box.x
-        : target.x;
-      const endY = box
-        ? kind === "spouse"
-          ? box.y
-          : box.y - box.h / 2
-        : target.y;
-      preview.setAttribute(
-        "d",
-        roundedPath(
-          [
-            { x: startX, y: startY },
-            kind === "spouse"
-              ? { x: (startX + endX) / 2, y: startY }
-              : { x: startX, y: (startY + endY) / 2 },
-            kind === "spouse"
-              ? { x: (startX + endX) / 2, y: endY }
-              : { x: endX, y: (startY + endY) / 2 },
-            { x: endX, y: endY },
-          ],
-          10,
-        ),
-      );
-      this.nodeLayer.classList.toggle("linking", !box);
-    };
-    this.capture(move, (upEvent) => {
-      this.interaction = null;
-      this.nodeLayer.classList.remove("linking");
-      const box = this.boxAt(upEvent.clientX, upEvent.clientY);
-      if (box) this.completeLink(fromId, box.id, kind);
-      else this.render();
-    });
-  }
-
-  completeLink(fromId, toId, kind) {
-    if (fromId === toId) {
-      this.render();
-      return;
-    }
-    if (kind === "spouse") {
-      const existing = this.store.edgeBetween(fromId, toId, EDGE_SPOUSE);
-      if (existing) {
-        new Notice(t("这两人已经是配偶关系了"));
-        this.render();
-        return;
-      }
-      this.store.addEdge(fromId, toId, EDGE_SPOUSE);
-      this.placeNew(toId);
-      new Notice(t("已建立配偶关系"));
-      this.render();
-      return;
-    }
-    const from = this.layout?.boxes.find((item) => item.id === fromId);
-    const to = this.layout?.boxes.find((item) => item.id === toId);
-    const reversed = from && to ? to.y < from.y - 24 : false;
-    const parentId = reversed ? toId : fromId;
-    const childId = reversed ? fromId : toId;
-    const existing = this.store.edgeBetween(parentId, childId, EDGE_PARENT);
-    if (existing) {
-      new Notice(t("这条亲子关系已经存在"));
-      this.render();
-      return;
-    }
-    if (this.store.parentsOf(childId).length >= 2) {
-      new Notice(t("这个人的父母已经两位了，先删掉一条再加"));
-      this.render();
-      return;
-    }
-    const edge = this.store.addEdge(parentId, childId, EDGE_PARENT);
-    if (!edge) new Notice(t("不能建立这条关系（会绕成环）"));
-    else new Notice(t("已建立亲子关系"));
-    this.render();
   }
 
   capture(move, end) {
@@ -1992,7 +1863,7 @@ export class JiapuView extends ItemView {
             this.store.addEdge(parentId, created.id, EDGE_PARENT);
           this.store.ensureCoupleLinks();
         } else {
-          new Notice(t("TA 还没填父母，新人是独立节点，请自行连线"));
+          new Notice(t("TA 还没填父母，新人是独立节点；右键它可添加父母"));
         }
         this.placeNew(created.id);
         this.selected = created.id;

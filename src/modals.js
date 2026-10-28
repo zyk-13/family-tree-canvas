@@ -1182,7 +1182,9 @@ export class KinshipModal extends Modal {
     if (!forward.ok) {
       this.resultEl.createEl("p", {
         cls: "jiapu-kinship-miss",
-        text: t("这两个人在图上连不起来——中间缺了关系（也许是缺一条连线）。"),
+        text: t(
+          "这两个人在图上连不起来——中间缺亲属关系，右键卡片补上父母、配偶或子女。",
+        ),
       });
       return;
     }

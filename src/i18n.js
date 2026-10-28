@@ -170,8 +170,8 @@ const EN = {
   "TA 下面还有 {count} 个子女，连线也会一起删掉，子女不会被删除。":
     "They have {count} children below — the links go too, but the children aren't deleted.",
   "与 TA 相连的线会一起删掉。": "Every link to them will be removed too.",
-  "TA 还没填父母，新人是独立节点，请自行连线":
-    "They have no parents recorded yet, so the new person is a standalone node — link them up yourself",
+  "TA 还没填父母，新人是独立节点；右键它可添加父母":
+    "They have no parents recorded yet, so the new person sits on its own — right-click them to add parents",
   "从人物库添加": "Add from people library",
   "从人物库添加…": "Add from people library…",
   "从人物库添加（别的布局里已经有的人）":
@@ -247,14 +247,6 @@ const EN = {
     "Link removed; the person is still on the graph",
   "这一家的亲子连线已全部断开":
     "All parent-child links in this family are removed",
-  "这两人已经是配偶关系了": "They're already spouses",
-  "已建立配偶关系": "Spouse link created",
-  "这条亲子关系已经存在": "That parent-child link already exists",
-  "这个人的父母已经两位了，先删掉一条再加":
-    "This person already has two parents — remove one link first",
-  "不能建立这条关系（会绕成环）":
-    "Can't create that link (it would form a loop)",
-  "已建立亲子关系": "Parent-child link created",
 
   // ---------- 紧缩 / 撤销 ----------
   "当前版本 {version}": "Version {version}",
@@ -283,8 +275,8 @@ const EN = {
   "关系链：{phrase}": "Chain: {phrase}",
   "按这张图的父子 / 配偶关系算称呼。出生日期写了就能分清「哥」和「弟」。点输入框直接打字搜名字，↑↓ 选、回车确认。":
     'Works out how to address someone from the parent and spouse links on this graph. Birth dates are what separate "elder" from "younger" siblings. Click the box and type to search; ↑↓ to move, Enter to confirm.',
-  "这两个人在图上连不起来——中间缺了关系（也许是缺一条连线）。":
-    "These two aren't connected on this graph — something's missing in between (maybe a link).",
+  "这两个人在图上连不起来——中间缺亲属关系，右键卡片补上父母、配偶或子女。":
+    "These two aren't connected on this graph — right-click a card to add a parent, spouse or child in between.",
   "这是按辈分推的近似叫法，各地叫法不一样。":
     "A rough term based on seniority — wording varies by region.",
   "关系比较远，没有通用称谓，照上面这条链子叫就行。":
@@ -402,6 +394,7 @@ const EN = {
   "已备份到 {path}（{people} 人、{layouts} 个布局）":
     "Backed up to {path} ({people} people, {layouts} layouts)",
   "备份失败：{message}": "Backup failed: {message}",
+  "文件不存在": "File not found",
   "读不到这个备份：{message}": "Cannot read this backup: {message}",
   "这个文件不是有效的 JSON": "This file is not valid JSON",
   "这个文件里没有家谱数据": "No family tree data in this file",

@@ -278,15 +278,6 @@
   opacity: 1;
 }
 
-.jiapu-link-preview {
-  fill: none;
-  stroke: var(--interactive-accent);
-  stroke-width: 2;
-  stroke-dasharray: 5 4;
-  vector-effect: non-scaling-stroke;
-  pointer-events: none;
-}
-
 /* 拖拽时的参考线：竖向＝对齐谁的中线，横向＝会落在哪一排 */
 .jiapu-guide {
   stroke: var(--interactive-accent);
@@ -396,46 +387,6 @@
   stroke: rgba(255, 255, 255, 0.82);
   stroke-width: 1;
   stroke-linejoin: round;
-}
-
-/* ---------- 连线把手 ---------- */
-
-.jiapu-handle {
-  opacity: 0;
-  transition: opacity 0.12s ease;
-  cursor: crosshair;
-}
-
-.jiapu-node:hover .jiapu-handle,
-.jiapu-handle:active {
-  opacity: 1;
-}
-
-.jiapu-handle-hit {
-  fill: var(--background-primary);
-  stroke: var(--background-modifier-border);
-  stroke-width: 1;
-}
-
-.jiapu-handle-dot {
-  fill: var(--text-faint);
-}
-
-.handle-spouse .jiapu-handle-dot {
-  fill: var(--text-accent);
-}
-
-.jiapu-handle:hover .jiapu-handle-hit {
-  stroke: var(--interactive-accent);
-  fill: var(--background-primary-alt);
-}
-
-.jiapu-handle:hover .jiapu-handle-dot {
-  fill: var(--interactive-accent);
-}
-
-.jiapu-nodes.linking .jiapu-handle {
-  opacity: 1;
 }
 
 /* ---------- 提示 ---------- */
