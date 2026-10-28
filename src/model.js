@@ -462,7 +462,7 @@ export class GraphStore {
       try {
         fn();
       } catch (error) {
-        console.error("[家谱图] 监听器出错", error);
+        console.error("[Family Tree] 监听器出错", error);
       }
     }
   }
@@ -481,7 +481,7 @@ export class GraphStore {
         this.rebuild();
       }
     } catch (error) {
-      console.error("[家谱图] 读取数据失败，已用空图代替", error);
+      console.error("[Family Tree] 读取数据失败，已用空图代替", error);
       this._data = emptyGraph();
       this.rebuild();
     }
@@ -511,7 +511,7 @@ export class GraphStore {
         JSON.stringify(this._data, null, 2),
       );
     } catch (error) {
-      console.error("[家谱图] 保存失败", error);
+      console.error("[Family Tree] 保存失败", error);
       this.dirty = true;
     }
   }
