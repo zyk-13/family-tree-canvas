@@ -690,9 +690,7 @@ export class JiapuView extends ItemView {
     for (const drop of path.drops) {
       const d = `M${drop.x},${drop.from}V${drop.to}`;
       const group = el("g", {
-        // is-one-sided：夫妻只有一方连了这个孩子，线画成虚线提醒补上
-        class:
-          "jiapu-line parent is-drop" + (drop.oneSided ? " is-one-sided" : ""),
+        class: "jiapu-line parent is-drop",
         "data-family": family,
         "data-child": drop.child,
         "data-parents": parentIds,
@@ -1936,6 +1934,7 @@ export class JiapuView extends ItemView {
         const created = this.store.addNode(draft);
         for (const parentId of this.parentsForNewChild(node))
           this.store.addEdge(parentId, created.id, EDGE_PARENT);
+        this.store.ensureCoupleLinks();
         this.placeNew(created.id);
         this.selected = created.id;
         this.render();
@@ -1991,6 +1990,7 @@ export class JiapuView extends ItemView {
         if (parents.length) {
           for (const parentId of parents)
             this.store.addEdge(parentId, created.id, EDGE_PARENT);
+          this.store.ensureCoupleLinks();
         } else {
           new Notice(t("TA 还没填父母，新人是独立节点，请自行连线"));
         }

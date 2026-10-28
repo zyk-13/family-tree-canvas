@@ -114,6 +114,8 @@ const EN = {
   "第 {n} 代（{count} 人）": "Generation {n} ({count} people)",
   "已切到布局「{name}」（{count} 人）":
     'Switched to layout "{name}" ({count} people)',
+  "已补全 {n} 条亲属连线（配偶双方）":
+    "Filled in {n} parent link(s) so both spouses are connected",
   "已复制成「{name}」": 'Duplicated as "{name}"',
   "已复制一份布局，位置和关系都带着":
     "Layout duplicated, positions and relations included",

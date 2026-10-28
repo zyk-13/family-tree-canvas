@@ -1,6 +1,6 @@
 {
-  "name": "obsidian-family-tree",
-  "version": "1.9.3",
+  "name": "obsidian-family-tree-canvas",
+  "version": "1.9.4",
   "description": "Lay out a family tree on a canvas in Obsidian.",
   "main": "main.js",
   "scripts": {

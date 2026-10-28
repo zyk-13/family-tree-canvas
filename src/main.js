@@ -62,6 +62,11 @@ export default class JiapuPlugin extends Plugin {
     setLang(resolveLang(this.settings.lang));
     this.store = new GraphStore(this.app, this);
     await this.store.load();
+    // 老数据里「只连了一方」的亲子边已被补成夫妻双方，说一声免得以为是自动改了
+    if (this.store.repairedLinks)
+      new Notice(
+        t("已补全 {n} 条亲属连线（配偶双方）", { n: this.store.repairedLinks }),
+      );
 
     this.registerView(VIEW_TYPE, (leaf) => new JiapuView(leaf, this));
 

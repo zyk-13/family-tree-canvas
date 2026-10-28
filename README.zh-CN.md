@@ -1,4 +1,4 @@
-# Family Tree
+# Family Tree Canvas
 
 [English](README.md) · 简体中文
 
@@ -6,7 +6,7 @@
 
 卡片会自动吸附到代际行：横向随你拖，纵向永远齐整。一个共用的人物库同时供给多张布局，而每个人在你的库里就是一篇笔记。
 
-![Family Tree 画布](docs/screenshot.png)
+![Family Tree Canvas 画布](docs/screenshot.png)
 
 ## 为什么还要再做一个家谱插件
 
@@ -28,13 +28,13 @@
 
 ## 安装
 
-上架之后，在**设置 → 第三方插件 → 浏览**里搜 **Family Tree** 即可。
+上架之后，在**设置 → 第三方插件 → 浏览**里搜 **Family Tree Canvas** 即可。
 
 在那之前只能手动装：
 
-1. 从[最新的 release](https://github.com/zyk-13/family-tree/releases/latest) 下载 `main.js`、`manifest.json`、`styles.css`。
-2. 三个文件放进 `<你的库>/.obsidian/plugins/family-tree/`。
-3. 重启 Obsidian，在**设置 → 第三方插件**里启用 **Family Tree**。
+1. 从[最新的 release](https://github.com/zyk-13/family-tree-canvas/releases/latest) 下载 `main.js`、`manifest.json`、`styles.css`。
+2. 三个文件放进 `<你的库>/.obsidian/plugins/family-tree-canvas/`。
+3. 重启 Obsidian，在**设置 → 第三方插件**里启用 **Family Tree Canvas**。
 
 ## 用法
 
@@ -48,8 +48,8 @@
 
 | 文件 | 内容 |
 | --- | --- |
-| `.obsidian/plugins/family-tree/graph.json` | 人物库和所有布局 |
-| `.obsidian/plugins/family-tree/data.json` | 插件设置 |
+| `.obsidian/plugins/family-tree-canvas/graph.json` | 人物库和所有布局 |
+| `.obsidian/plugins/family-tree-canvas/data.json` | 插件设置 |
 | 你选的备份文件夹（默认 `family/家谱备份`） | 带时间戳的 JSON 备份 |
 
 **卸载插件会把它的文件夹一起删掉，`graph.json` 也在里面。** 卸载前先导出一份备份 —— 工具栏上那个下载图标就是干这个的。

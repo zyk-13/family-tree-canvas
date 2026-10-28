@@ -205,13 +205,6 @@
   stroke: var(--jiapu-line-strong);
 }
 
-/* 夫妻只有一方连了这个孩子：这根竖线画成虚线。
-   否则图上看着跟双亲都连好了一样，导出成单亲才发现少了一根。 */
-.jiapu-line.parent.is-drop.is-one-sided .jiapu-seg {
-  stroke-dasharray: 3 4;
-  opacity: 0.5;
-}
-
 .jiapu-line.spouse .jiapu-seg {
   stroke: var(--jiapu-spouse);
   stroke-width: var(--jiapu-spouse-w, 2.4);

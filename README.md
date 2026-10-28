@@ -1,4 +1,4 @@
-# Family Tree
+# Family Tree Canvas
 
 English · [简体中文](README.zh-CN.md)
 
@@ -6,7 +6,7 @@ Lay out a family tree on a canvas the way you'd sketch one on paper — not a ge
 
 Cards snap to generation rows, so you drag people where you want them sideways and the tree stays tidy vertically. One shared people library feeds several layouts, and every person is a note in your vault.
 
-![Family Tree canvas](docs/screenshot.png)
+![Family Tree Canvas](docs/screenshot.png)
 
 ## Why another family tree plugin
 
@@ -28,13 +28,13 @@ That matters when a family is messy — remarriage, adoption, someone raised by 
 
 ## Install
 
-Once published, search for **Family Tree** in *Settings → Community plugins → Browse*.
+Once published, search for **Family Tree Canvas** in *Settings → Community plugins → Browse*.
 
 Until then, install manually:
 
-1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/zyk-13/family-tree/releases/latest).
-2. Put them in `<your vault>/.obsidian/plugins/family-tree/`.
-3. Reload Obsidian and enable **Family Tree** in *Settings → Community plugins*.
+1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/zyk-13/family-tree-canvas/releases/latest).
+2. Put them in `<your vault>/.obsidian/plugins/family-tree-canvas/`.
+3. Reload Obsidian and enable **Family Tree Canvas** in *Settings → Community plugins*.
 
 ## Usage
 
@@ -48,8 +48,8 @@ Until then, install manually:
 
 | File | Contents |
 | --- | --- |
-| `.obsidian/plugins/family-tree/graph.json` | The people library and every layout |
-| `.obsidian/plugins/family-tree/data.json` | Plugin settings |
+| `.obsidian/plugins/family-tree-canvas/graph.json` | The people library and every layout |
+| `.obsidian/plugins/family-tree-canvas/data.json` | Plugin settings |
 | The backup folder you choose (default `family/家谱备份`) | Timestamped JSON backups |
 
 **Uninstalling the plugin deletes its folder, including `graph.json`.** Export a backup first — that's what the download icon in the toolbar is for.

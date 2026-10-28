@@ -467,6 +467,73 @@ export class GraphStore {
     }
   }
 
+  /**
+   * 夫妻是同一批子女的父母：孩子只连了其中一方时，把另一方补上。
+   *
+   * 以前「在配偶下添加子女」只连了当前这张卡片，另一边就漏了。图上被夫妻
+   * 的合线遮住看不出来，导出成单亲才暴露。这里按夫妻双方把缺的边补齐，
+   * 只在无歧义时动手：对方得在同一布局里，且这位家长只有这一个配偶。
+   *
+   * @returns {number} 补了几条边
+   */
+  linkCouplesChildren() {
+    let added = 0;
+    for (const layout of this._data.layouts) {
+      const inLayout = new Set(layout.nodes.map((node) => node.pid));
+      const spouses = new Map();
+      const parents = new Map();
+      const push = (map, key, value) => {
+        const list = map.get(key);
+        if (list) list.push(value);
+        else map.set(key, [value]);
+      };
+      for (const edge of layout.edges) {
+        if (edge.type === "spouse") {
+          push(spouses, edge.from, edge.to);
+          push(spouses, edge.to, edge.from);
+        } else if (edge.type === "parent") {
+          push(parents, edge.to, edge.from);
+        }
+      }
+      for (const [child, parentIds] of parents) {
+        if (parentIds.length !== 1) continue;
+        const only = parentIds[0];
+        const partners = (spouses.get(only) ?? []).filter(
+          (id) => id !== child && inLayout.has(id),
+        );
+        // 再婚、配偶不在本布局：分不清是谁的孩子，不猜
+        if (partners.length !== 1) continue;
+        const partner = partners[0];
+        const exists = layout.edges.some(
+          (item) =>
+            item.type === "parent" && item.from === partner && item.to === child,
+        );
+        if (exists) continue;
+        layout.edges.push({
+          id: makeId("e"),
+          from: partner,
+          to: child,
+          type: "parent",
+          label: "",
+        });
+        parentIds.push(partner);
+        added += 1;
+      }
+    }
+    if (added) this._index = null;
+    return added;
+  }
+
+  /** 补全夫妻双方连线并落盘（新建亲属后调用，保证当场就对上） */
+  ensureCoupleLinks() {
+    const added = this.linkCouplesChildren();
+    if (!added) return 0;
+    this.rebuild();
+    this.emit();
+    this.queueSave();
+    return added;
+  }
+
   async load() {
     const path = this.filePath;
     if (!path) return this.graph;
@@ -490,6 +557,12 @@ export class GraphStore {
     if (rawVersion < GRAPH_VERSION && this.nodes.length) {
       ensurePositions(this);
       packRows(this);
+      await this.save();
+    }
+    // 老数据里「只想连一方」的亲子边：补成夫妻双方，图上才是实线到底
+    this.repairedLinks = this.linkCouplesChildren();
+    if (this.repairedLinks) {
+      this.rebuild();
       await this.save();
     }
     this.emit();
@@ -535,6 +608,7 @@ export class GraphStore {
 
   replaceGraph(graph) {
     this._data = normalizeGraph(graph);
+    this.linkCouplesChildren();
     this.rebuild();
     this.emit();
     this.queueSave();
